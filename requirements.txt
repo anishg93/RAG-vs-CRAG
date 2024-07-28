@@ -3,6 +3,12 @@ transformers
 langchain
 langchain-community
 langchain-core
+langchain-openai
+langchainhub
+chromadb
+langgraph
+tavily-python
+tiktoken
 faiss-cpu
 datasets
 typing-extensions
