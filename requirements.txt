@@ -1,6 +1,9 @@
-langchain
 torch
 transformers
-sentence-transformers
-datasets
+langchain
+langchain-community
+langchain-core
 faiss-cpu
+datasets
+typing-extensions
+sentencepiece
