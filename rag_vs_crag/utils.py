@@ -98,21 +98,17 @@ def check_retriever(
     return results
 
 
-class GradeDocuments(BaseModel):
-    """Binary score for relevance check on retrieved documents."""
+# class GradeDocuments(BaseModel):
+#     """Binary score for relevance check on retrieved documents."""
 
-    binary_score: str = Field(...,
-        description="Documents are relevant to the question, 'yes' or 'no'"
-    )
+#     binary_score: str = Field(...,
+#         description="Documents are relevant to the question, 'yes' or 'no'"
+#     )
 
 
-def get_retrieval_grading_pipeline(
-    # retriever: Any,
-    # input_vars: List[str],
-    # query: str=None,
-):
+def get_retrieval_grading_pipeline():
+    
     grading_llm = ChatOllama(model=local_llm, format="json", temperature=0)
-    # structured_grading_llm = grading_llm.with_structure(GradeDocuments)
 
     grading_prompt = ChatPromptTemplate.from_messages(
         [
@@ -126,11 +122,8 @@ def get_retrieval_grading_pipeline(
     return retrieval_grader
 
 
-def get_rag_pipeline(
-    # retriever: Any,
-    # input_vars: List[str],
-    # query: str=None,
-):
+def get_rag_pipeline():
+
     generation_llm = ChatOllama(model=local_llm, temperature=0)
 
     generation_prompt = hub.pull("rlm/rag-prompt")
@@ -140,9 +133,7 @@ def get_rag_pipeline(
     return rag_chain_pipeline
 
 
-def get_query_rewriter(
-    # input_vars: List[str],
-):
+def get_query_rewriter():
     
     rewriter_llm = ChatOllama(model=local_llm, temperature=0)
 
