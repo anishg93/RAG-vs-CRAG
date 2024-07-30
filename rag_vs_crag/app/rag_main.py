@@ -71,7 +71,7 @@ def rag_main(
         question = state["question"]
 
         # Retrieval
-        documents = retriever.get_relevant_documents(question)
+        documents = retriever.invoke(question)
         return {"documents": documents, "question": question}
 
 
