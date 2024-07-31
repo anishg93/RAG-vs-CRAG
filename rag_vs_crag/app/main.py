@@ -1,6 +1,5 @@
-from rag_main import rag_main, chat_with_rag
-from crag_main import crag_main, chat_with_crag
-
+from crag_main import chat_with_crag, crag_main
+from rag_main import chat_with_rag, rag_main
 
 if __name__ == "__main__":
 
