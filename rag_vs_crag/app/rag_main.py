@@ -1,14 +1,16 @@
 import os
 import sys
-from typing import List
+from typing import List, Union
+
+from langgraph.graph import END, START, StateGraph
 from typing_extensions import TypedDict
-# from IPython.display import Image, display
-from langchain.schema import Document
-from langgraph.graph import START, END, StateGraph
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')))
-from typing import List, Union, Any
-from utils import *
+
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+)
+
 from prompt_template import *
+from utils import *
 
 
 ## Define the RAG pipeline to generate the answer to the prvioded query
@@ -23,7 +25,9 @@ def rag_main(
     document_chunks = get_chunks_from_document(doc_from_url)
 
     ## Get the retriever for the documents
-    retriever = get_retriever(embedding_model_name="all-MiniLM-L6-v2", document_chunks=document_chunks)
+    retriever = get_retriever(
+        embedding_model_name="all-MiniLM-L6-v2", document_chunks=document_chunks
+    )
 
     ## Get the RAG generation pipeline
     rag_chain = get_rag_pipeline()
@@ -43,7 +47,6 @@ def rag_main(
         question: str
         generation: str
         documents: List[str]
-
 
     ## Define the retrieve node
     def retrieve(state):
@@ -99,6 +102,7 @@ def rag_main(
 
     return custom_graph
 
+
 ## Define the function to chat with the RAG pipeline
 def chat_with_rag(custom_graph):
 
@@ -106,18 +110,18 @@ def chat_with_rag(custom_graph):
 
         ## Prompt the user for a query as input
         question = input("Enter your question (or type 'stop' to exit): ")
-        
+
         ## Check if the user wants to stop the interaction
-        if question.lower() == 'stop':
+        if question.lower() == "stop":
             print("Exiting the RAG pipeline. Goodbye!")
             break
-        
+
         ## Create an example dictionary with the user's query
         example = {"question": question}
-        
+
         ## Get the response from the custom graph
         response = get_crag_response(custom_graph=custom_graph, example=example)
-        
+
         ## Print the answer and the steps taken
         print("\nAnswer:\n", response)
         print("\n")

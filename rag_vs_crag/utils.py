@@ -1,28 +1,20 @@
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import WebBaseLoader
-from langchain_community.vectorstores import Chroma
-from sentence_transformers import SentenceTransformer
-from langchain import hub
-from typing import List
-from langchain.prompts import PromptTemplate
-from langchain_community.chat_models import ChatOllama
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_mistralai.chat_models import ChatMistralAI
-from langchain_core.output_parsers import StrOutputParser
-from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.pydantic_v1 import BaseModel, Field
-from typing import List, Union, Any
-from typing_extensions import TypedDict
-from IPython.display import Image, display
-from langchain.schema import Document
-from langgraph.graph import START, END, StateGraph
-import uuid
-from prompt_template import GradePrompt, GeneratePrompt, RewritePrompt
 import os
 from pprint import pprint
-from dotenv import load_dotenv
+from typing import Any, List, Union
 
+from dotenv import load_dotenv
+from langchain import hub
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.chat_models import ChatOllama
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_community.vectorstores import Chroma
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langgraph.graph import StateGraph
+from sentence_transformers import SentenceTransformer
+
+from prompt_template import GradePrompt, RewritePrompt
 
 ## Load the API key from the .env file
 load_dotenv()
@@ -38,7 +30,7 @@ metadata = f"CRAG, {model_tested}"
 def get_document_from_url(
     urls: Union[str, List[str]],
 ):
-    
+
     ## Check if the input is a string or a list
     if isinstance(urls, str):
         urls = [urls]
@@ -58,7 +50,7 @@ def get_chunks_from_document(
     text_chunk_size: int = 250,
     overlap: int = 0,
 ):
-    
+
     ## Split the document into chunks
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
         chunk_size=text_chunk_size, chunk_overlap=overlap
@@ -73,7 +65,7 @@ def get_retriever(
     embedding_model_name: str,
     document_chunks,
 ):
-    
+
     ## Load the Sentence Transformer model for document embeddings
     embedding_model = SentenceTransformer(embedding_model_name)
 
@@ -84,7 +76,7 @@ def get_retriever(
 
         def embed_documents(self, documents: List[str]) -> List[List[float]]:
             return self.model.encode(documents).tolist()
-        
+
         def embed_query(self, query):
             return self.model.encode(query).tolist()
 
@@ -95,7 +87,7 @@ def get_retriever(
     vectorstore = Chroma.from_documents(
         documents=document_chunks,
         collection_name="rag-chroma",
-        embedding=custom_embeddings
+        embedding=custom_embeddings,
     )
 
     ## Get the retriever
@@ -110,7 +102,7 @@ def check_retriever(
     query: str,
     top_k: int = 3,
 ):
-    
+
     ## Get the relevant documents using the retriever
     results = retriever.get_relevant_documents(query, top_k=top_k)
 
@@ -122,7 +114,7 @@ def check_retriever(
 
 ## Util function to get the retrieval grading pipeline
 def get_retrieval_grading_pipeline():
-    
+
     ## Load the local LLM model for grading
     grading_llm = ChatOllama(model=local_llm, format="json", temperature=0)
 
@@ -130,7 +122,10 @@ def get_retrieval_grading_pipeline():
     grading_prompt = ChatPromptTemplate.from_messages(
         [
             ("system", GradePrompt),
-            ("human", "Retrieved document: \n\n {document} \n\n User question: {question}"),
+            (
+                "human",
+                "Retrieved document: \n\n {document} \n\n User question: {question}",
+            ),
         ]
     )
 
@@ -155,7 +150,7 @@ def get_rag_pipeline():
 
 
 def get_query_rewriter():
-    
+
     ## Load the local LLM model for rewriting thye initial query
     rewriter_llm = ChatOllama(model=local_llm, temperature=0)
 
@@ -179,7 +174,7 @@ def get_query_rewriter():
 def get_web_search(
     k: int = 3,
 ):
-    
+
     ## Define the web search tool using Tavily Search Results
     web_search_tool = TavilySearchResults(k=k)
 
@@ -197,10 +192,7 @@ def get_web_search(
 #     return {"response": state_dict["generation"], "steps": state_dict["steps"]}
 
 
-def get_crag_response(
-    custom_graph: StateGraph,
-    example: dict
-):
+def get_crag_response(custom_graph: StateGraph, example: dict):
 
     ## Stream the output from the custom graph defined using all the individual nodes
     for output in custom_graph.stream(example):
