@@ -21,32 +21,45 @@ import uuid
 from prompt_template import GradePrompt, GeneratePrompt, RewritePrompt
 import os
 from pprint import pprint
+from dotenv import load_dotenv
 
 
-os.environ["TAVILY_API_KEY"] = "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"
+## Load the API key from the .env file
+load_dotenv()
+os.environ["TAVILY_API_KEY"] = os.getenv("TAVILY_API_KEY")
+
+## Define the local LLM model
 local_llm = "llama3"
 model_tested = "llama3-8b"
 metadata = f"CRAG, {model_tested}"
 
 
+## Util function to get documents from URL provided
 def get_document_from_url(
     urls: Union[str, List[str]],
 ):
+    
+    ## Check if the input is a string or a list
     if isinstance(urls, str):
         urls = [urls]
 
+    ## Load the documents from the URLs
     docs = [WebBaseLoader(url).load() for url in urls]
+
+    ## Flatten the list of documents
     docs_list = [item for sublist in docs for item in sublist]
 
     return docs_list
 
 
+## Util function to split the document into chunks
 def get_chunks_from_document(
     document,
     text_chunk_size: int = 250,
     overlap: int = 0,
 ):
     
+    ## Split the document into chunks
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
         chunk_size=text_chunk_size, chunk_overlap=overlap
     )
@@ -55,12 +68,16 @@ def get_chunks_from_document(
     return doc_splits
 
 
+## Util function to get the retriever for the documents
 def get_retriever(
     embedding_model_name: str,
     document_chunks,
 ):
+    
+    ## Load the Sentence Transformer model for document embeddings
     embedding_model = SentenceTransformer(embedding_model_name)
 
+    ## Custom class for Sentence Embeddings so that it has embed_documents and embed_query methods
     class CustomSentenceEmbeddings:
         def __init__(self, model: SentenceTransformer):
             self.model = model
@@ -71,45 +88,45 @@ def get_retriever(
         def embed_query(self, query):
             return self.model.encode(query).tolist()
 
-    # Create the embedding object
+    ## Create the embedding object
     custom_embeddings = CustomSentenceEmbeddings(embedding_model)
 
-    # Add to Chroma vectorDB
+    ## Add to Chroma vectorDB
     vectorstore = Chroma.from_documents(
         documents=document_chunks,
         collection_name="rag-chroma",
         embedding=custom_embeddings
     )
+
+    ## Get the retriever
     retriever = vectorstore.as_retriever()
 
     return retriever
 
 
+## Util function to check if the retriever is working
 def check_retriever(
     retriever: Any,
     query: str,
     top_k: int = 3,
 ):
     
+    ## Get the relevant documents using the retriever
     results = retriever.get_relevant_documents(query, top_k=top_k)
 
+    ## Check if results are found
     assert len(results) > 0, "No results found"
 
     return results
 
 
-# class GradeDocuments(BaseModel):
-#     """Binary score for relevance check on retrieved documents."""
-
-#     binary_score: str = Field(...,
-#         description="Documents are relevant to the question, 'yes' or 'no'"
-#     )
-
-
+## Util function to get the retrieval grading pipeline
 def get_retrieval_grading_pipeline():
     
+    ## Load the local LLM model for grading
     grading_llm = ChatOllama(model=local_llm, format="json", temperature=0)
 
+    ## Define the grading prompt template
     grading_prompt = ChatPromptTemplate.from_messages(
         [
             ("system", GradePrompt),
@@ -117,6 +134,7 @@ def get_retrieval_grading_pipeline():
         ]
     )
 
+    ## Define the retrieval grader pipeline using the grading prompt, LLM model and JSON output parser
     retrieval_grader = grading_prompt | grading_llm | JsonOutputParser()
 
     return retrieval_grader
@@ -124,10 +142,13 @@ def get_retrieval_grading_pipeline():
 
 def get_rag_pipeline():
 
+    ## Load the local LLM model for generation
     generation_llm = ChatOllama(model=local_llm, temperature=0)
 
+    ## Define the generation prompt template using Langchain Hub
     generation_prompt = hub.pull("rlm/rag-prompt")
 
+    ## Define the RAG pipeline using the generation prompt, LLM model and string output parser
     rag_chain_pipeline = generation_prompt | generation_llm | StrOutputParser()
 
     return rag_chain_pipeline
@@ -135,8 +156,10 @@ def get_rag_pipeline():
 
 def get_query_rewriter():
     
+    ## Load the local LLM model for rewriting thye initial query
     rewriter_llm = ChatOllama(model=local_llm, temperature=0)
 
+    ## Define the rewrite prompt template
     re_write_prompt = ChatPromptTemplate.from_messages(
         [
             ("system", RewritePrompt),
@@ -147,6 +170,7 @@ def get_query_rewriter():
         ]
     )
 
+    ## Define the question rewriter using the rewrite prompt, LLM model and string output parser
     question_rewriter = re_write_prompt | rewriter_llm | StrOutputParser()
 
     return question_rewriter
@@ -155,28 +179,33 @@ def get_query_rewriter():
 def get_web_search(
     k: int = 3,
 ):
+    
+    ## Define the web search tool using Tavily Search Results
     web_search_tool = TavilySearchResults(k=k)
 
     return web_search_tool
 
 
-def predict_custom_agent_local_answer(
-    custom_graph: StateGraph,
-    example: dict
-):
-    config = {"configurable": {"thread_id": str(uuid.uuid4())}}
-    state_dict = custom_graph.invoke(
-        {"question": example["input"], "steps": []}, config
-    )
-    return {"response": state_dict["generation"], "steps": state_dict["steps"]}
+# def predict_custom_agent_local_answer(
+#     custom_graph: StateGraph,
+#     example: dict
+# ):
+#     config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+#     state_dict = custom_graph.invoke(
+#         {"question": example["input"], "steps": []}, config
+#     )
+#     return {"response": state_dict["generation"], "steps": state_dict["steps"]}
 
 
 def get_crag_response(
     custom_graph: StateGraph,
     example: dict
 ):
-    # inputs = {"question": "What are the types of agent memory?"}
+
+    ## Stream the output from the custom graph defined using all the individual nodes
     for output in custom_graph.stream(example):
+
+        ## Print the output
         for key, value in output.items():
             # Node
             pprint(f"Node '{key}':")

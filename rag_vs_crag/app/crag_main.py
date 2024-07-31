@@ -10,28 +10,34 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__f
 from utils import *
 from prompt_template import *
 
-os.environ["TAVILY_API_KEY"] = "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"
 
-
+## Define the CRAG pipeline to generate the answer to the prvioded query
 def crag_main(
     urls: Union[str, List[str]],
 ):
 
+    ## Get the documents from the provided URLs (one URL or a list of URLs)
     doc_from_url = get_document_from_url(urls)
 
+    ## Split the document into chunks
     document_chunks = get_chunks_from_document(doc_from_url)
 
+    ## Get the retriever for the documents
     retriever = get_retriever(embedding_model_name="all-MiniLM-L6-v2", document_chunks=document_chunks)
 
+    ## Get the grading pipeline for the retrieved documents
     retrieval_grader = get_retrieval_grading_pipeline()
 
+    ## Get the RAG generation pipeline
     rag_chain = get_rag_pipeline()
 
+    ## Get the query rewriter
     question_rewriter = get_query_rewriter()
 
+    ## Get the web search tool (Tavily Search)
     web_search_tool = get_web_search(k=5)
 
-
+    ## Define the graph state class to orchestrate the CRAG pipeline
     class GraphState(TypedDict):
         """
         Represents the state of our graph.
@@ -49,6 +55,7 @@ def crag_main(
         documents: List[str]
 
 
+    ## Define the retrieve node
     def retrieve(state):
         """
         Retrieve documents
@@ -62,11 +69,12 @@ def crag_main(
         print("---RETRIEVE---")
         question = state["question"]
 
-        # Retrieval
+        ## Documents retrieval
         documents = retriever.invoke(question)
         return {"documents": documents, "question": question}
 
 
+    ## Define the generate node
     def generate(state):
         """
         Generate answer
@@ -81,11 +89,12 @@ def crag_main(
         question = state["question"]
         documents = state["documents"]
 
-        # RAG generation
+        ## RAG generation
         generation = rag_chain.invoke({"context": documents, "question": question})
         return {"documents": documents, "question": question, "generation": generation}
 
 
+    ## Define the documents grading node
     def grade_documents(state):
         """
         Determines whether the retrieved documents are relevant to the question.
@@ -101,13 +110,17 @@ def crag_main(
         question = state["question"]
         documents = state["documents"]
 
-        # Score each doc
+        # #Score each document
         filtered_docs = []
         web_search = "No"
         for d in documents:
+
+            ## Grade the document with the retrieval grader
             score = retrieval_grader.invoke(
                 {"document": d.page_content, "question": question}
             )
+
+            ## Check if the document is relevant
             grade = score["binary_score"]
             if grade == "yes":
                 print("---GRADE: DOCUMENT RELEVANT---")
@@ -119,6 +132,7 @@ def crag_main(
         return {"documents": filtered_docs, "question": question, "web_search": web_search}
 
 
+    ## Define the query transformation node
     def transform_query(state):
         """
         Transform the query to produce a better question.
@@ -134,12 +148,15 @@ def crag_main(
         question = state["question"]
         documents = state["documents"]
 
-        # Re-write question
+        ## Re-write question using the query rewriter
         better_question = question_rewriter.invoke({"question": question})
+
+        ## Print the transformed query
         print(better_question)
         return {"documents": documents, "question": better_question}
 
 
+    ## Define the web search node
     def web_search(state):
         """
         Web search based on the re-phrased question.
@@ -153,11 +170,12 @@ def crag_main(
 
         print("---WEB SEARCH---")
         question = state["question"]
-        # documents = state["documents"]
         documents = state.get("documents", [])
 
-        # Web search
+        ## Web search using the Web Search tool
         docs = web_search_tool.invoke({"query": question})
+
+        ## Append the web search results to the documents
         documents.extend(
             [
                 Document(page_content=d["content"], metadata={"url": d["url"]})
@@ -167,6 +185,7 @@ def crag_main(
         return {"documents": documents, "question": question}
     
 
+    ## Define the decision node to determine the next step (if geneerate or transform query)
     def decide_to_generate(state):
         """
         Determines whether to generate an answer, or re-generate a question.
@@ -183,30 +202,32 @@ def crag_main(
         web_search = state["web_search"]
         state["documents"]
 
+        ## Check if all documents are relevant or not
         if web_search == "Yes":
-            # All documents have been filtered check_relevance
-            # We will re-generate a new query
+
+            ## If all documents are not relevant, transform the query
             print(
                 "---DECISION: ALL DOCUMENTS ARE NOT RELEVANT TO QUESTION, TRANSFORM QUERY---"
             )
             return "transform_query"
-            # return "web_search"
         else:
-            # We have relevant documents, so generate answer
+
+            ## If all documents are relevant, generate the answer
             print("---DECISION: GENERATE---")
             return "generate"
 
-    # Graph
+
+    ## Define the workflow graph
     workflow = StateGraph(GraphState)
 
-    # Define the nodes
+    ## Define the nodes
     workflow.add_node("retrieve", retrieve)  # retrieve
     workflow.add_node("grade_documents", grade_documents)  # grade documents
     workflow.add_node("generate", generate)  # generatae
     workflow.add_node("transform_query", transform_query)  # transform_query
     workflow.add_node("web_search_node", web_search)  # web search
 
-    # Build graph
+    ## Build the graph with the nodes
     workflow.add_edge(START, "retrieve")
     workflow.add_edge("retrieve", "grade_documents")
     workflow.add_conditional_edges(
@@ -221,36 +242,31 @@ def crag_main(
     workflow.add_edge("web_search_node", "generate")
     workflow.add_edge("generate", END)
 
+    ## Compile the graph
     custom_graph = workflow.compile()
 
     return custom_graph
 
 
+## Define the function to chat with the CRAG pipeline
 def chat_with_crag(custom_graph):
+
     while True:
-        # Prompt the user for a question
+
+        ## Prompt the user for a query as input
         question = input("Enter your question (or type 'stop' to exit): ")
         
-        # Check if the user wants to stop the interaction
+        ## Check if the user wants to stop the interaction
         if question.lower() == 'stop':
             print("Exiting the CRAG pipeline. Goodbye!")
             break
         
-        # Create an example dictionary with the user's question
+        ## Create an example dictionary with the user's query
         example = {"question": question}
         
-        # Get the response from the custom RAG pipeline
+        ## Get the response from the custom graph
         response = get_crag_response(custom_graph=custom_graph, example=example)
 
-        # answer = response["response"]
-        # steps = response["steps"]
-        
-        # Print the answer and the steps taken
+        ## Print the answer and the steps taken
         print("\nAnswer:\n", response)
-        # print("\nSteps:\n", steps)
         print("\n")
-
-
-if __name__ == "__main__":
-    
-    chat_with_crag(custom_graph)
