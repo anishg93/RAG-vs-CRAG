@@ -1,14 +1,17 @@
 import os
 import sys
-from typing import List, Union, Any
-from typing_extensions import TypedDict
-# from IPython.display import Image, display
-from langchain.schema import Document
-from langgraph.graph import START, END, StateGraph
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')))
+from typing import List, Union
 
-from utils import *
+from langchain.schema import Document
+from langgraph.graph import END, START, StateGraph
+from typing_extensions import TypedDict
+
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+)
+
 from prompt_template import *
+from utils import *
 
 
 ## Define the CRAG pipeline to generate the answer to the prvioded query
@@ -23,7 +26,9 @@ def crag_main(
     document_chunks = get_chunks_from_document(doc_from_url)
 
     ## Get the retriever for the documents
-    retriever = get_retriever(embedding_model_name="all-MiniLM-L6-v2", document_chunks=document_chunks)
+    retriever = get_retriever(
+        embedding_model_name="all-MiniLM-L6-v2", document_chunks=document_chunks
+    )
 
     ## Get the grading pipeline for the retrieved documents
     retrieval_grader = get_retrieval_grading_pipeline()
@@ -54,7 +59,6 @@ def crag_main(
         web_search: str
         documents: List[str]
 
-
     ## Define the retrieve node
     def retrieve(state):
         """
@@ -72,7 +76,6 @@ def crag_main(
         ## Documents retrieval
         documents = retriever.invoke(question)
         return {"documents": documents, "question": question}
-
 
     ## Define the generate node
     def generate(state):
@@ -92,7 +95,6 @@ def crag_main(
         ## RAG generation
         generation = rag_chain.invoke({"context": documents, "question": question})
         return {"documents": documents, "question": question, "generation": generation}
-
 
     ## Define the documents grading node
     def grade_documents(state):
@@ -129,8 +131,11 @@ def crag_main(
                 print("---GRADE: DOCUMENT NOT RELEVANT---")
                 web_search = "Yes"
                 continue
-        return {"documents": filtered_docs, "question": question, "web_search": web_search}
-
+        return {
+            "documents": filtered_docs,
+            "question": question,
+            "web_search": web_search,
+        }
 
     ## Define the query transformation node
     def transform_query(state):
@@ -155,7 +160,6 @@ def crag_main(
         print(better_question)
         return {"documents": documents, "question": better_question}
 
-
     ## Define the web search node
     def web_search(state):
         """
@@ -179,11 +183,11 @@ def crag_main(
         documents.extend(
             [
                 Document(page_content=d["content"], metadata={"url": d["url"]})
-                for d in docs if isinstance(d, dict)
+                for d in docs
+                if isinstance(d, dict)
             ]
         )
         return {"documents": documents, "question": question}
-    
 
     ## Define the decision node to determine the next step (if geneerate or transform query)
     def decide_to_generate(state):
@@ -215,7 +219,6 @@ def crag_main(
             ## If all documents are relevant, generate the answer
             print("---DECISION: GENERATE---")
             return "generate"
-
 
     ## Define the workflow graph
     workflow = StateGraph(GraphState)
@@ -255,15 +258,15 @@ def chat_with_crag(custom_graph):
 
         ## Prompt the user for a query as input
         question = input("Enter your question (or type 'stop' to exit): ")
-        
+
         ## Check if the user wants to stop the interaction
-        if question.lower() == 'stop':
+        if question.lower() == "stop":
             print("Exiting the CRAG pipeline. Goodbye!")
             break
-        
+
         ## Create an example dictionary with the user's query
         example = {"question": question}
-        
+
         ## Get the response from the custom graph
         response = get_crag_response(custom_graph=custom_graph, example=example)
 
