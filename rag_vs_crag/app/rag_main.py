@@ -7,39 +7,28 @@ from langchain.schema import Document
 from langgraph.graph import START, END, StateGraph
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')))
 from typing import List, Union, Any
-
 from utils import *
 from prompt_template import *
 
 
+## Define the RAG pipeline to generate the answer to the prvioded query
 def rag_main(
     urls: Union[str, List[str]],
 ):
 
-
+    ## Get the documents from the provided URLs (one URL or a list of URLs)
     doc_from_url = get_document_from_url(urls)
 
+    ## Split the document into chunks
     document_chunks = get_chunks_from_document(doc_from_url)
 
+    ## Get the retriever for the documents
     retriever = get_retriever(embedding_model_name="all-MiniLM-L6-v2", document_chunks=document_chunks)
 
-    # retrieval_grader = get_retrieval_grading_pipeline(retriever=retriever, input_vars=['question', 'documents'])
-    # retrieval_grader = get_retrieval_grading_pipeline()
-
-    # docs = retriever.invoke("How are you?")
-    # doc_txt = docs[1].page_content
-    # response_temp = retrieval_grader.invoke({"question": "How are you?", "documents": doc_txt})
-    # print(response_temp)
-
-    # rag_chain = get_rag_pipeline(retriever=retriever, input_vars=['question', 'documents'])
+    ## Get the RAG generation pipeline
     rag_chain = get_rag_pipeline()
 
-    # question_rewriter = get_query_rewriter(input_vars=["question"])
-    # question_rewriter = get_query_rewriter()
-
-    # web_search_tool = get_web_search(k=5)
-
-
+    ## Define the graph state class to orchestrate the RAG pipeline
     class GraphState(TypedDict):
         """
         Represents the state of our graph.
@@ -53,10 +42,10 @@ def rag_main(
 
         question: str
         generation: str
-        # web_search: str
         documents: List[str]
 
 
+    ## Define the retrieve node
     def retrieve(state):
         """
         Retrieve documents
@@ -70,11 +59,11 @@ def rag_main(
         print("---RETRIEVE---")
         question = state["question"]
 
-        # Retrieval
+        ## Documents retrieval
         documents = retriever.invoke(question)
         return {"documents": documents, "question": question}
 
-
+    ## Define the generate node
     def generate(state):
         """
         Generate answer
@@ -89,51 +78,46 @@ def rag_main(
         question = state["question"]
         documents = state["documents"]
 
-        # RAG generation
+        ## RAG generation
         generation = rag_chain.invoke({"context": documents, "question": question})
         return {"documents": documents, "question": question, "generation": generation}
 
-    # Graph
+    ## Define the workflow graph
     workflow = StateGraph(GraphState)
 
-    # Define the nodes
+    ## Define the nodes
     workflow.add_node("retrieve", retrieve)  # retrieve
     workflow.add_node("generate", generate)  # generatae
 
-    # Build graph
+    ## Build the graph with the nodes
     workflow.add_edge(START, "retrieve")
     workflow.add_edge("retrieve", "generate")
     workflow.add_edge("generate", END)
 
+    ## Compile the graph
     custom_graph = workflow.compile()
 
     return custom_graph
 
+## Define the function to chat with the RAG pipeline
 def chat_with_rag(custom_graph):
+
     while True:
-        # Prompt the user for a question
+
+        ## Prompt the user for a query as input
         question = input("Enter your question (or type 'stop' to exit): ")
         
-        # Check if the user wants to stop the interaction
+        ## Check if the user wants to stop the interaction
         if question.lower() == 'stop':
             print("Exiting the RAG pipeline. Goodbye!")
             break
         
-        # Create an example dictionary with the user's question
+        ## Create an example dictionary with the user's query
         example = {"question": question}
         
-        # Get the response from the custom RAG pipeline
+        ## Get the response from the custom graph
         response = get_crag_response(custom_graph=custom_graph, example=example)
-
-        # answer = response["response"]
-        # steps = response["steps"]
         
-        # Print the answer and the steps taken
+        ## Print the answer and the steps taken
         print("\nAnswer:\n", response)
-        # print("\nSteps:\n", steps)
         print("\n")
-
-
-if __name__ == "__main__":
-    
-    chat_with_rag(custom_graph)
