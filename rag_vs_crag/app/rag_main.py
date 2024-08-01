@@ -106,14 +106,14 @@ def rag_main(
 
 
 ## Define the function to chat with the RAG pipeline
-def chat_with_rag(custom_graph):
+def chat_with_rag(custom_graph: StateGraph):
 
     while True:
 
-        ## Prompt the user for a query as input
+        # Prompt the user for a query as input
         question = input("Enter your question (or type 'stop' to exit): ")
 
-        ## Check if the user wants to stop the interaction
+        # Check if the user wants to stop the interaction
         if question.lower() == "stop":
             print("Exiting the RAG pipeline. Goodbye!")
             break

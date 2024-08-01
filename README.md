@@ -35,11 +35,17 @@ How you can run this system in your local machine is described below:
     pip install -r requirements.txt
     ```
 - Download `ollama` for desktop from [Ollama Official Site](https://ollama.com/)
-- Choose an LLM model for your task. I chose `Llama3 8B` (you can choose some other models as well)
-- Download the model using `ollama pull <model_identifier>`, for example,
+- Choose some LLM models for your task. I chose `Llama3 8B` (you can choose some other models as well)
+- You can change the model name in `/rag_vs_crag/app/main.py` in the variable `local_llm` as shown below,
   ```python
-  ollama pull llama3
+  local_llm = "llama3"
   ```
+  - You can select any models from [Ollama Model Hub](https://ollama.com/library) 
+- You can also change the embedding model name in `../main.py` in `embedding_model_name` as shown below,
+  ```python
+  embedding_model_name = "all-MiniLM-L6-v2"
+  ```
+  - You can select any [Hugging Face Sentence Transformers Models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html) for text embedding for your retriever
 - 
 
 ### Comparison Between RAG and CRAG
