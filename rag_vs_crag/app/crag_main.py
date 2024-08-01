@@ -255,14 +255,14 @@ def crag_main(
 
 
 ## Define the function to chat with the CRAG pipeline
-def chat_with_crag(custom_graph):
+def chat_with_crag(custom_graph: StateGraph):
 
     while True:
 
-        ## Prompt the user for a query as input
+        # Prompt the user for a query as input
         question = input("Enter your question (or type 'stop' to exit): ")
 
-        ## Check if the user wants to stop the interaction
+        # Check if the user wants to stop the interaction
         if question.lower() == "stop":
             print("Exiting the CRAG pipeline. Goodbye!")
             break
@@ -273,6 +273,6 @@ def chat_with_crag(custom_graph):
         ## Get the response from the custom graph
         response = get_crag_response(custom_graph=custom_graph, example=example)
 
-        ## Print the answer and the steps taken
+        # Print the answer and the steps taken
         print("\nAnswer:\n", response)
         print("\n")

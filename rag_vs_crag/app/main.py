@@ -1,12 +1,10 @@
 from crag_main import chat_with_crag, crag_main
 from rag_main import chat_with_rag, rag_main
-import subprocess
-
 import os
 import subprocess
 
 
-def pull_model_once(local_llm):
+def pull_model_once(local_llm: str):
     
     ## Define the path for the flag file
     flag_file = "llm_pulled.flag"
@@ -19,13 +17,9 @@ def pull_model_once(local_llm):
         command = f"ollama pull {local_llm}"
 
         try:
-            ## Execute the command
-            result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            
-            ## Print the output and error (if any)
-            print("Command output:", result.stdout.decode())
-            if result.stderr:
-                print("Command error:", result.stderr.decode())
+            ## Execute the command, suppressing the output
+            with open(os.devnull, 'w') as devnull:
+                result = subprocess.run(command, shell=True, check=True, stdout=devnull, stderr=devnull)
             
             ## Create the flag file to indicate the model has been pulled
             with open(flag_file, 'w') as f:
@@ -33,9 +27,10 @@ def pull_model_once(local_llm):
             print("Flag file created.")
 
         except subprocess.CalledProcessError as e:
-            print(f"Error occurred: {e.stderr.decode()}")
+            print(f"Error occurred while pulling the model.")
     else:
-        print("Model has already been pulled. Skipping the pull command from Ollama.")
+        print("Model has already been pulled. Skipping the pull command.")
+
 
 
 if __name__ == "__main__":
@@ -54,7 +49,7 @@ if __name__ == "__main__":
     ## Define the Sentence Transformer model name
     embedding_model_name = "all-MiniLM-L6-v2"
 
-    ## Call the main functions for both RAG and CRAG
+    # ## Call the main functions for both RAG and CRAG
     custom_graph_rag = rag_main(urls, local_llm=local_llm, embedding_model_name=embedding_model_name)
     custom_graph_crag = crag_main(urls, local_llm=local_llm, embedding_model_name=embedding_model_name, max_results_k=5)
 
