@@ -16,6 +16,8 @@ from utils import *
 ## Define the RAG pipeline to generate the answer to the prvioded query
 def rag_main(
     urls: Union[str, List[str]],
+    local_llm: str,
+    embedding_model_name: str,
 ):
 
     ## Get the documents from the provided URLs (one URL or a list of URLs)
@@ -26,11 +28,11 @@ def rag_main(
 
     ## Get the retriever for the documents
     retriever = get_retriever(
-        embedding_model_name="all-MiniLM-L6-v2", document_chunks=document_chunks
+        embedding_model_name, document_chunks=document_chunks
     )
 
     ## Get the RAG generation pipeline
-    rag_chain = get_rag_pipeline()
+    rag_chain = get_rag_pipeline(local_llm)
 
     ## Define the graph state class to orchestrate the RAG pipeline
     class GraphState(TypedDict):

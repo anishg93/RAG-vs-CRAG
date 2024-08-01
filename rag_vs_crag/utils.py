@@ -20,11 +20,6 @@ from prompt_template import GradePrompt, RewritePrompt
 load_dotenv()
 os.environ["TAVILY_API_KEY"] = os.getenv("TAVILY_API_KEY")
 
-## Define the local LLM model
-local_llm = "llama3"
-model_tested = "llama3-8b"
-metadata = f"CRAG, {model_tested}"
-
 
 ## Util function to get documents from URL provided
 def get_document_from_url(
@@ -113,7 +108,9 @@ def check_retriever(
 
 
 ## Util function to get the retrieval grading pipeline
-def get_retrieval_grading_pipeline():
+def get_retrieval_grading_pipeline(
+    local_llm
+):
 
     ## Load the local LLM model for grading
     grading_llm = ChatOllama(model=local_llm, format="json", temperature=0)
@@ -135,7 +132,9 @@ def get_retrieval_grading_pipeline():
     return retrieval_grader
 
 
-def get_rag_pipeline():
+def get_rag_pipeline(
+    local_llm
+):
 
     ## Load the local LLM model for generation
     generation_llm = ChatOllama(model=local_llm, temperature=0)
@@ -149,7 +148,9 @@ def get_rag_pipeline():
     return rag_chain_pipeline
 
 
-def get_query_rewriter():
+def get_query_rewriter(
+    local_llm
+):
 
     ## Load the local LLM model for rewriting thye initial query
     rewriter_llm = ChatOllama(model=local_llm, temperature=0)
@@ -176,20 +177,9 @@ def get_web_search(
 ):
 
     ## Define the web search tool using Tavily Search Results
-    web_search_tool = TavilySearchResults(k=k)
+    web_search_tool = TavilySearchResults(max_results=k)
 
     return web_search_tool
-
-
-# def predict_custom_agent_local_answer(
-#     custom_graph: StateGraph,
-#     example: dict
-# ):
-#     config = {"configurable": {"thread_id": str(uuid.uuid4())}}
-#     state_dict = custom_graph.invoke(
-#         {"question": example["input"], "steps": []}, config
-#     )
-#     return {"response": state_dict["generation"], "steps": state_dict["steps"]}
 
 
 def get_crag_response(custom_graph: StateGraph, example: dict):

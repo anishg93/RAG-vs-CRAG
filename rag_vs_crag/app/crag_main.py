@@ -17,6 +17,9 @@ from utils import *
 ## Define the CRAG pipeline to generate the answer to the prvioded query
 def crag_main(
     urls: Union[str, List[str]],
+    local_llm: str,
+    embedding_model_name: str,
+    max_results_k: int,
 ):
 
     ## Get the documents from the provided URLs (one URL or a list of URLs)
@@ -27,20 +30,20 @@ def crag_main(
 
     ## Get the retriever for the documents
     retriever = get_retriever(
-        embedding_model_name="all-MiniLM-L6-v2", document_chunks=document_chunks
+        embedding_model_name, document_chunks=document_chunks
     )
 
     ## Get the grading pipeline for the retrieved documents
-    retrieval_grader = get_retrieval_grading_pipeline()
+    retrieval_grader = get_retrieval_grading_pipeline(local_llm)
 
     ## Get the RAG generation pipeline
-    rag_chain = get_rag_pipeline()
+    rag_chain = get_rag_pipeline(local_llm)
 
     ## Get the query rewriter
-    question_rewriter = get_query_rewriter()
+    question_rewriter = get_query_rewriter(local_llm)
 
     ## Get the web search tool (Tavily Search)
-    web_search_tool = get_web_search(k=5)
+    web_search_tool = get_web_search(k=max_results_k)
 
     ## Define the graph state class to orchestrate the CRAG pipeline
     class GraphState(TypedDict):
