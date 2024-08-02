@@ -2,8 +2,6 @@
 
 ## Table of Contents
 
-- [RAG-vs-CRAG](#rag-vs-crag)
-  - [Table of Contents](#table-of-contents)
 - [Project Title](#project-title)
 - [Project Description](#project-description)
 - [Installation and User Guide](#installation-and-user-guide)
@@ -19,9 +17,9 @@ In this project, we delve into the comparison between two advanced approaches in
 
 This project aims to provide a detailed analysis of RAG and CRAG, highlighting their key differences, advantages, and potential use cases. We will explore:
 
-- The fundamental difference between RAG and CRAG
+- Implementation user guide for both RAG and CRAG agents
 - Comparative performance
-- Practical implementation details
+- Implementation difference between both RAG and CRAG
 
 By the end of this project, we hope to offer insights into which method may be more suitable for specific scenarios and how these technologies can be further developed to improve NLP systems.
 
@@ -41,12 +39,12 @@ How you can run this system in your local machine is described below:
   ```python
   local_llm = "llama3"
   ```
-  - You can select any models from [Ollama Model Hub](https://ollama.com/library) 
+  - You can choose any models from [Ollama Model Hub](https://ollama.com/library) 
 - You can also change the embedding model name in `../main.py` in `embedding_model_name` as shown below,
   ```python
   embedding_model_name = "all-MiniLM-L6-v2"
   ```
-  - You can select any [Hugging Face Sentence Transformers Models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html) for document embedding for your retriever
+  - You can choose any [Hugging Face Sentence Transformers Models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html) for document embedding for the retriever
 - For vectorstore/vector database I have used [Chroma Vectorstore](https://www.trychroma.com/) but you are welcome to experiment with other vectorstores as well.
 - Lastly, select any website url to test this out. Replace the `urls` variable with your website url.
 - In terminal, run the following command
@@ -65,6 +63,8 @@ How you can run this system in your local machine is described below:
   - If you don't have any more questions, just type `stop` to finish the chat with the agent
 
 ## Comparison Between RAG and CRAG
+
+
 
 # Approach
 
