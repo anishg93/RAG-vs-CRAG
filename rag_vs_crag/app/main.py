@@ -53,8 +53,8 @@ if __name__ == "__main__":
     custom_graph_rag = rag_main(urls, local_llm=local_llm, embedding_model_name=embedding_model_name)
     custom_graph_crag = crag_main(urls, local_llm=local_llm, embedding_model_name=embedding_model_name, max_results_k=5)
 
-    ## Chat with the user and take the chain type as input
-    chain_type = input("Enter the chain type you want to use ('rag' or 'crag'): ")
+    ## Chat with the user and take the agent type as input
+    chain_type = input("Enter the agent type you want to use ('rag' or 'crag'): ")
 
     ## Call the chat function for the respective chain type
     if chain_type == "rag":

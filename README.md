@@ -5,7 +5,7 @@
   - [Table of Contents](#table-of-contents)
   - [Project Title](#project-title)
   - [Project Description](#project-description)
-  - [Installation and Usage](#installation-and-usage)
+  - [Installation and User Guide](#installation-and-user-guide)
     - [Comparison Between RAG and CRAG](#comparison-between-rag-and-crag)
   - [Approach](#approach)
   - [Conclusion](#conclusion)
@@ -24,7 +24,7 @@ This project aims to provide a detailed analysis of RAG and CRAG, highlighting t
 
 By the end of this project, we hope to offer insights into which method may be more suitable for specific scenarios and how these technologies can be further developed to improve NLP systems.
 
-## Installation and Usage
+## Installation and User Guide
 
 How you can run this system in your local machine is described below:
 
@@ -45,8 +45,23 @@ How you can run this system in your local machine is described below:
   ```python
   embedding_model_name = "all-MiniLM-L6-v2"
   ```
-  - You can select any [Hugging Face Sentence Transformers Models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html) for text embedding for your retriever
-- 
+  - You can select any [Hugging Face Sentence Transformers Models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html) for document embedding for your retriever
+- For vectorstore/vector database I have used [Chroma Vectorstore](https://www.trychroma.com/) but you are welcome to experiment with other vectorstores as well.
+- Lastly, select any website url to test this out. Replace the `urls` variable with your website url.
+- In terminal, run the following command
+  ```python
+  cd rag_vs_crag/app
+  python main.py
+  ```
+  - You will get a prompt asking you to enter the agent type like below,
+  ```
+  Enter the agent type you want to use ('rag' or 'crag'):
+  ```
+  - Once you enter either `rag` or `crag` and press enter then you get another prompt asking you to enter your question to the selected agent like below,
+  ```
+  Enter your question (or type 'stop' to exit): 
+  ```
+  - If you don't have any more questions, just type `stop` to finish the chat with the agent
 
 ### Comparison Between RAG and CRAG
 
