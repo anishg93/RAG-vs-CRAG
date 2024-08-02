@@ -1,20 +1,21 @@
 # RAG-vs-CRAG
 
 ## Table of Contents
+
 - [RAG-vs-CRAG](#rag-vs-crag)
   - [Table of Contents](#table-of-contents)
-  - [Project Title](#project-title)
-  - [Project Description](#project-description)
-  - [Installation and User Guide](#installation-and-user-guide)
-    - [Comparison Between RAG and CRAG](#comparison-between-rag-and-crag)
-  - [Approach](#approach)
-  - [Conclusion](#conclusion)
+- [Project Title](#project-title)
+- [Project Description](#project-description)
+- [Installation and User Guide](#installation-and-user-guide)
+  - [Comparison Between RAG and CRAG](#comparison-between-rag-and-crag)
+- [Approach](#approach)
+- [Conclusion](#conclusion)
 
-## Project Title
+# Project Title
 
 In this project, we delve into the comparison between two advanced approaches in the field of Generative AI : Retrieval-Augmented Generation (RAG) and Corrective Retrieval-Augmented Generation (CRAG). Both methodologies leverage external knowledge sources to enhance the generation of more accurate and contextually relevant responses. However, they differ in their mechanisms and effectiveness in various applications.
 
-## Project Description
+# Project Description
 
 This project aims to provide a detailed analysis of RAG and CRAG, highlighting their key differences, advantages, and potential use cases. We will explore:
 
@@ -24,7 +25,7 @@ This project aims to provide a detailed analysis of RAG and CRAG, highlighting t
 
 By the end of this project, we hope to offer insights into which method may be more suitable for specific scenarios and how these technologies can be further developed to improve NLP systems.
 
-## Installation and User Guide
+# Installation and User Guide
 
 How you can run this system in your local machine is described below:
 
@@ -63,8 +64,8 @@ How you can run this system in your local machine is described below:
   ```
   - If you don't have any more questions, just type `stop` to finish the chat with the agent
 
-### Comparison Between RAG and CRAG
+## Comparison Between RAG and CRAG
 
-## Approach
+# Approach
 
-## Conclusion
+# Conclusion
