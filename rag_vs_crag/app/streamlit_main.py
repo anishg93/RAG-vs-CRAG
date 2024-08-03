@@ -22,11 +22,6 @@ def pull_model_once(local_llm: str):
         st.write("Model has already been pulled. Skipping the pull command.")
 
 
-url = "https://theworldtravelguy.com/the-great-pyramids-of-giza-in-egypt-facts-tours-pictures/"
-local_llm = "llama3"
-embedding_model_name = "all-MiniLM-L6-v2"
-
-
 def main(url, local_llm, embedding_model_name):
     st.title("Corrective RAG Chat Interface")
     st.write("Welcome to the Corrective RAG chat interface!")
@@ -64,4 +59,10 @@ def main(url, local_llm, embedding_model_name):
             st.write(f"**{speaker}:** {text}")
 
 if __name__ == "__main__":
+
+
+    url = "https://theworldtravelguy.com/the-great-pyramids-of-giza-in-egypt-facts-tours-pictures/"
+    local_llm = "llama3"
+    embedding_model_name = "all-MiniLM-L6-v2"
+    
     main(url=url, local_llm=local_llm, embedding_model_name=embedding_model_name)
