@@ -276,3 +276,12 @@ def chat_with_crag(custom_graph: StateGraph):
         # Print the answer and the steps taken
         print("\nAnswer:\n", response)
         print("\n")
+
+
+def chat_with_crag_ui(custom_graph, question):
+    if question.lower() == "stop":
+        return "Exiting the CRAG pipeline. Goodbye!"
+
+    example = {"question": question}
+    response = get_crag_response(custom_graph=custom_graph, example=example)
+    return response

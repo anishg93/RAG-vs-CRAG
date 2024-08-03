@@ -46,10 +46,14 @@ if __name__ == "__main__":
 
     urls = "https://www.findingtheuniverse.com/two-weeks-in-ukmy-perfect-itinerary/"
 
+    # urls = "https://indiacurrents.com/tracing-the-history-of-biryani/"
+
+    # urls = "https://waitbutwhy.com/2014/06/taming-mammoth-let-peoples-opinions-run-life.html"
+
     ## Define the Sentence Transformer model name
     embedding_model_name = "all-MiniLM-L6-v2"
 
-    # ## Call the main functions for both RAG and CRAG
+    ## Call the main functions for both RAG and CRAG
     custom_graph_rag = rag_main(urls, local_llm=local_llm, embedding_model_name=embedding_model_name)
     custom_graph_crag = crag_main(urls, local_llm=local_llm, embedding_model_name=embedding_model_name, max_results_k=5)
 
