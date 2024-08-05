@@ -18,6 +18,6 @@ Use three sentences maximum and keep the answer concise
 
 
 RewritePrompt = """
-You a question re-writer that converts an input question to a better version that is optimized \n 
+You are a question re-writer that converts an input question to a better version that is optimized \n 
 for web search. Look at the input and try to reason about the underlying semantic intent / meaning.
 """
