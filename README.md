@@ -21,7 +21,7 @@ This project aims to provide a detailed analysis of RAG and CRAG, highlighting t
 - Comparative performance
 - Implementation difference between both RAG and CRAG
 
-By the end of this project, we hope to offer insights into which method may be more suitable for specific scenarios and how these technologies can be further developed to improve NLP systems.
+By the end of this project, we hope to offer insights into which method may be more suitable for specific scenarios and how these technologies can be further developed to improve agentic framework development systems.
 
 # Installation and User Guide
 
