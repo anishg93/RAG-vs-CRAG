@@ -46,7 +46,7 @@ How you can run this system in your local machine as described below:
   ```python
   local_llm = "<your_LLM_model_name>"  ##line 65
   ```
-- Go to [Tavily](tavily.com) and create an API key which would be required for web-search
+- Go to [Tavily](https://tavily.com/) and create an API key which would be required for web-search
   - Once you get your API key, in VS code, create a `.env` file and paste the following:
   ```python
   TAVILY_API_KEY="<your_Tavily_API_key>"
