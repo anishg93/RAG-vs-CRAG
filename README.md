@@ -1,3 +1,5 @@
+![Static Badge](https://img.shields.io/badge/Intro-GenAI--LLM_Agent-blue) ![Static Badge](https://img.shields.io/badge/LLM-Llama3_8b-red) ![Static Badge](https://img.shields.io/badge/RAG-Enabled-green) ![Static Badge](https://img.shields.io/badge/CRAG-Enabled-green) ![Static Badge](https://img.shields.io/badge/Embedding-all--MiniLM--L6--v2-brightgreen) ![Static Badge](https://img.shields.io/badge/VectorStore-Chroma-brightgreen) ![Static Badge](https://img.shields.io/badge/Orchestration-LangGraph-brightgreen) ![Static Badge](https://img.shields.io/badge/Frontend-Streamlit-blue)
+
 # RAG-vs-CRAG
 
 ## Table of Contents
