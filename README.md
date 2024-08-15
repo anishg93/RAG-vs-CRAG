@@ -23,8 +23,6 @@ By the end of this project, we hope to offer insights into which method may be m
 
 # Installation and User Guide
 
-### For non-tech users
-
 How you can run this system in your local machine as described below:
 
 - Clone this repo 
