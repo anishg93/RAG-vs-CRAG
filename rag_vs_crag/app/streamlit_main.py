@@ -25,8 +25,8 @@ def pull_model_once(local_llm: str):
 
 
 def main(url, local_llm, embedding_model_name):
-    st.title("Corrective RAG Chat Interface")
-    st.write("Welcome to the Corrective RAG chat interface!")
+    st.title("RAG/Corrective RAG Agent Chat Interface")
+    st.write("Hello there! Welcome to the RAG/Corrective RAG chat interface!")
 
     pull_model_once(local_llm=local_llm)
 
