@@ -166,3 +166,6 @@ settings.json
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .git-credentials
+
+# Any pdf files
+rag_vs_crag/app/*.pdf
