@@ -47,11 +47,11 @@ How you can run this system in your local machine as described below:
   local_llm = "<your_LLM_model_name>"  ##line 65
   ```
 - Go to [Tavily](https://tavily.com/) and create an API key which would be required for web-search
-  - Once you get your API key, in VS code, create a `.env` file and paste the following:
+  - Once you get your API key, in VS code, create a `.env` file under root directory and paste the following:
   ```python
-  TAVILY_API_KEY="<your_Tavily_API_key>"
+  TAVILY_API_KEY="<YOUR_TAVILY_API_KEY>"
   ```
-  - Remember to add `.env` to `.gitignore` so that your `Tavilty_API_key` does not get leaked
+  - Remember to add `.env` to `.gitignore` so that your `TAVILY_API_KEY` does not get leaked
 - You can also change the embedding model name in `../streamlist_main.py` in `embedding_model_name` as shown below,
   ```python
   embedding_model_name = "<your_embedding_model_name>"  ##line 66
