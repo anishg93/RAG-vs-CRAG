@@ -69,6 +69,7 @@ streamlit run streamlit_main.py
 ```
   - It will open the chat interface where you can chat with the RAG/CRAG agent (there is a dropdown to select from rag/crag) about the website link you prvided
   - The field to provide website url is editable so any point in time you can change the link in the interface itself.
+  - If you do not want to provide any website url, you also have a chance to upload one or multiple pdf files on the same topic in the interface (there is an option to upload)
   - The chat history will also be displayed and saved
   - **Happy chatting!**
 
