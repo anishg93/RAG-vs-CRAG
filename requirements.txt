@@ -6,3 +6,4 @@ python-dotenv==1.0.1
 sentence_transformers==3.0.1
 typing_extensions==4.12.2
 streamlit
+pypdf==4.3.1
