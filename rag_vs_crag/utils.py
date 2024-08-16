@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from langchain import hub
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.chat_models import ChatOllama
-from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_community.vectorstores import Chroma
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
@@ -21,22 +21,28 @@ load_dotenv()
 os.environ["TAVILY_API_KEY"] = os.getenv("TAVILY_API_KEY")
 
 
-## Util function to get documents from URL provided
+## Util function to get documents from URL(s) provided or the pdf file(s) provided
 def get_document_from_url(
-    urls: Union[str, List[str]],
+    sources: Union[str, List[str]],
 ):
-
     ## Check if the input is a string or a list
-    if isinstance(urls, str):
-        urls = [urls]
+    if isinstance(sources, str):
+        sources = [sources]
 
-    ## Load the documents from the URLs
-    docs = [WebBaseLoader(url).load() for url in urls]
+    docs = []
+    for source in sources:
+        if source.startswith(('http://', 'https://')):
+            # If it's a web URL
+            loader = WebBaseLoader(source)
+        elif source.lower().endswith('.pdf') and os.path.isfile(source):
+            # If it's a local PDF file
+            loader = PyPDFLoader(source)
+        else:
+            raise ValueError(f"Unsupported source or file not found: {source}")
+        
+        docs.extend(loader.load())
 
-    ## Flatten the list of documents
-    docs_list = [item for sublist in docs for item in sublist]
-
-    return docs_list
+    return docs
 
 
 ## Util function to split the document into chunks
